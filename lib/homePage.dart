@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import './BaseAuth.dart';
 import './ShopDetails.dart';
@@ -12,42 +13,24 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final databaseRef = Firestore.instance;
+  List<DocumentSnapshot> data;
+  Future<void> getData() async {
+    await databaseRef
+        .collection("Shops")
+        .getDocuments()
+        .then((QuerySnapshot snapshot) {
+      data = snapshot.documents;
+    });
+    //print(data);
+  }
+
   Widget shopList() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ShopDetails()),
-          );
-        },
-        child: Container(
-          height: 80,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Colors.green[900],
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: Colors.red,
-              style: BorderStyle.solid,
-            ),
-          ),
-          child: Row(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Image(
-                  image: AssetImage(
-                    "images/s1.png",
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    getData();
+    print(data);
+    data.forEach((f) {
+      print(f.data["Rating"]);
+    });
   }
 
   @override

@@ -14,8 +14,6 @@ abstract class BaseAuth {
   Future<void> signOut();
 
   Future<bool> isEmailVerified();
-
-  Future<void> getShops();
 }
 
 class Auth implements BaseAuth {
@@ -37,7 +35,6 @@ class Auth implements BaseAuth {
     AuthResult authResult = await firebaseAuth.signInWithEmailAndPassword(
         email: email, password: password);
     FirebaseUser user = authResult.user;
-    print("login jo");
     return user.uid;
   }
 
@@ -63,14 +60,5 @@ class Auth implements BaseAuth {
   Future<void> sendEmailVerification() async {
     FirebaseUser user = await firebaseAuth.currentUser();
     user.sendEmailVerification();
-  }
-
-  Future<void> getShops() async {
-    databaseReference
-      .collection("Shops")
-      .getDocuments()
-      .then((QuerySnapshot snapshot) {
-    snapshot.documents.forEach((f) => print('${f.data}}'));
-  });
   }
 }
