@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shoppy1/BaseAuth.dart';
+import 'package:shoppy1/Root.dart';
+import 'package:shoppy1/main.dart';
 
 class DrawerMenu extends StatefulWidget {
+  BaseAuth auth;
+  VoidCallback logoutCallback;
+  DrawerMenu(this.auth, this.logoutCallback);
   @override
   _DrawerMenuState createState() => _DrawerMenuState();
 }
@@ -13,14 +19,9 @@ class _DrawerMenuState extends State<DrawerMenu> {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-
             child: Text(
               'Shoppy',
-              style: TextStyle(
-                  fontSize: 30
-
-              ),
-
+              style: TextStyle(fontSize: 30),
             ),
             decoration: BoxDecoration(
               color: Colors.blue,
@@ -92,6 +93,10 @@ class _DrawerMenuState extends State<DrawerMenu> {
             ),
             onTap: () {
               Navigator.pop(context);
+              widget.logoutCallback();
+              widget.auth.signOut();
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => MyHomePage()));
             },
           ),
         ],

@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import 'ShopDetails.dart';
-import 'BaseAuth.dart';
-import 'drawer.dart';
+import './BaseAuth.dart';
+import './ShopDetails.dart';
+import './drawer.dart';
 
 class HomePage extends StatefulWidget {
+  final BaseAuth auth;
+  final VoidCallback logoutCallback;
+  HomePage({this.auth, this.logoutCallback});
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-
   Widget shopList() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -70,7 +72,7 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        drawer: DrawerMenu(),
+        drawer: DrawerMenu(widget.auth, widget.logoutCallback),
         body: shopList(),
       ),
     );

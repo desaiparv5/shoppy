@@ -68,11 +68,14 @@ class _RootState extends State<Root> {
         break;
 
       case AuthStatus.NOT_LOGGED_IN:
-        return Login(widget.auth, setLogin);
+        return Login(widget.auth, setLogin, setLogout);
         break;
       case AuthStatus.LOGGED_IN:
         if (uid.length > 0 && uid != null) {
-          return HomePage();
+          return HomePage(
+            auth: widget.auth,
+            logoutCallback: setLogout,
+          );
         } else {
           return showLoading();
         }
