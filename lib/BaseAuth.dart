@@ -5,7 +5,7 @@ import 'dart:async';
 abstract class BaseAuth {
   Future<String> signIn(String email, String password);
 
-  Future<String> signUp(String email, String password);
+  Future<String> signUp(Map data);
 
   Future<FirebaseUser> getCurrentUser();
 
@@ -16,6 +16,8 @@ abstract class BaseAuth {
   Future<bool> isEmailVerified();
 
   Future<void> getShops();
+
+  Future<void> addUser(Map data, String uid);
 }
 
 class Auth implements BaseAuth {
@@ -23,13 +25,26 @@ class Auth implements BaseAuth {
   final databaseReference = Firestore.instance;
 
   @override
-  Future<String> signUp(String email, String password) async {
-    print("andar avyu");
+  Future<String> signUp(Map data) async {
     AuthResult authResult = await firebaseAuth.createUserWithEmailAndPassword(
-        email: email, password: password);
+        email: data['email'], password: data['password']);
     FirebaseUser user = authResult.user;
-    print("jo: ");
+    addUser(data, user.uid);
     return user.uid;
+  }
+
+  @override
+  Future<void> addUser(Map data, String uid) async {
+    databaseReference
+    .collection("Users")
+        .document(uid).setData(
+          {
+            'Address':data['add1']+" "+data["add2"],
+            'Mobile':data['phone'],
+            'Pincode':data['pin'],
+            'Name':data['name'],
+          }
+    );
   }
 
   @override
@@ -37,7 +52,6 @@ class Auth implements BaseAuth {
     AuthResult authResult = await firebaseAuth.signInWithEmailAndPassword(
         email: email, password: password);
     FirebaseUser user = authResult.user;
-    print("login jo");
     return user.uid;
   }
 
