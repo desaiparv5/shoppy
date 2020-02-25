@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 
 abstract class BaseAuth {
@@ -13,10 +14,13 @@ abstract class BaseAuth {
   Future<void> signOut();
 
   Future<bool> isEmailVerified();
+
+  Future<void> getShops();
 }
 
 class Auth implements BaseAuth {
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  final databaseReference = Firestore.instance;
 
   @override
   Future<String> signUp(String email, String password) async {
@@ -56,5 +60,14 @@ class Auth implements BaseAuth {
   Future<void> sendEmailVerification() async {
     FirebaseUser user = await firebaseAuth.currentUser();
     user.sendEmailVerification();
+  }
+
+  Future<void> getShops() async {
+    databaseReference
+      .collection("Shops")
+      .getDocuments()
+      .then((QuerySnapshot snapshot) {
+    snapshot.documents.forEach((f) => print('${f.data}}'));
+  });
   }
 }

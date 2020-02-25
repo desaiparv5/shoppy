@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'ShopDetails.dart';
+import 'BaseAuth.dart';
 import 'drawer.dart';
 
 class HomePage extends StatefulWidget {
@@ -8,6 +9,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
   Widget shopList() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
