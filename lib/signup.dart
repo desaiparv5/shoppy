@@ -27,11 +27,21 @@ class _SignUpState extends State<SignUp> {
       pin_val;
 
   Future<void> signup() async {
+    Map data =
+    {
+      'name':name_val,
+      'email': email_val,
+      'password': password_val,
+      'add1': add1_val,
+      'add2': add2_val,
+      'phone': phone_val,
+      'pin': pin_val,
+    };
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
       String uid = "";
       try {
-        uid = await widget.auth.signUp(email_val, password_val);
+        uid = await widget.auth.signUp(data);
         if (uid.length > 0 && uid != null) {
           widget.loginCallback();
           Navigator.pushReplacement(
