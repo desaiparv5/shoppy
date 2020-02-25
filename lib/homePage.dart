@@ -2,38 +2,21 @@ import 'package:flutter/material.dart';
 import 'ShopDetails.dart';
 import 'drawer.dart';
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatefulWidget {
+class HomePage extends StatefulWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _MyAppState extends State<MyApp> {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'TODOist',
-      //theme: ThemeData(fontFamily: 'Roboto'),
-      home: myHomePage(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
-
-class myHomePage extends StatefulWidget {
-  @override
-  _myHomePageState createState() => _myHomePageState();
-}
-
-class _myHomePageState extends State<myHomePage> {
-  Widget shopList()
-  {
+class _HomePageState extends State<HomePage> {
+  Widget shopList() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: GestureDetector(
-        onTap: (){
-          Navigator.push(context, MaterialPageRoute(builder: (context)=> ShopDetails()),);
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ShopDetails()),
+          );
         },
         child: Container(
           height: 80,
@@ -50,18 +33,19 @@ class _myHomePageState extends State<myHomePage> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Image(image: AssetImage("images/s1.png",),
-
+                child: Image(
+                  image: AssetImage(
+                    "images/s1.png",
+                  ),
                 ),
               ),
-
             ],
           ),
-
         ),
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
