@@ -15,8 +15,6 @@ abstract class BaseAuth {
 
   Future<bool> isEmailVerified();
 
-  Future<void> getShops();
-
   Future<void> addUser(Map data, String uid);
 }
 
@@ -35,16 +33,13 @@ class Auth implements BaseAuth {
 
   @override
   Future<void> addUser(Map data, String uid) async {
-    databaseReference
-    .collection("Users")
-        .document(uid).setData(
-          {
-            'Address':data['add1']+" "+data["add2"],
-            'Mobile':data['phone'],
-            'Pincode':data['pin'],
-            'Name':data['name'],
-          }
-    );
+    databaseReference.collection("Users").document(uid).setData({
+      'Address': data['add1'] + " " + data["add2"],
+      'Mobile': data['phone'],
+      'Pincode': data['pin'],
+      'Name': data['name'],
+    });
+    print('sign up');
   }
 
   @override
@@ -77,14 +72,5 @@ class Auth implements BaseAuth {
   Future<void> sendEmailVerification() async {
     FirebaseUser user = await firebaseAuth.currentUser();
     user.sendEmailVerification();
-  }
-
-  Future<void> getShops() async {
-    databaseReference
-      .collection("Shops")
-      .getDocuments()
-      .then((QuerySnapshot snapshot) {
-    snapshot.documents.forEach((f) => print('${f.data}}'));
-  });
   }
 }

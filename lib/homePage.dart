@@ -1,6 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import './BaseAuth.dart';
-import './ShopDetails.dart';
+import "./shopcard.dart";
 import './drawer.dart';
 
 class HomePage extends StatefulWidget {
@@ -12,69 +13,71 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Widget shopList() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ShopDetails()),
-          );
-        },
-        child: Container(
-          height: 80,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Colors.green[900],
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: Colors.red,
-              style: BorderStyle.solid,
-            ),
-          ),
-          child: Row(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Image(
-                  image: AssetImage(
-                    "images/s1.png",
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  final databaseRef = Firestore.instance;
+  List<DocumentSnapshot> data;
+  Future<void> getData() async {
+    //print(data);
+  }
+
+  List<Widget> shopList() {
+    List<Widget> array = [];
+    getData().then((value) {
+      print(data);
+      data.forEach((f) {
+        print(f.data["Rating"]);
+        array.add(MyCard(f));
+      });
+      print(array);
+      return array;
+    });
+  }
+
+  Future demo() async {
+    QuerySnapshot querySnapshot =
+        await databaseRef.collection("Shops").getDocuments();
+    return querySnapshot.documents;
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: Row(
-            children: <Widget>[
-              Expanded(
-                child: Container(
-                  child: Text("Shoppy"),
+          appBar: AppBar(
+            title: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Container(
+                    child: Text("Shoppy"),
+                  ),
                 ),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Icon(Icons.shopping_cart),
-                ],
-              ),
-            ],
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Icon(Icons.shopping_cart),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-        drawer: DrawerMenu(widget.auth, widget.logoutCallback),
-        body: shopList(),
-      ),
+          drawer: DrawerMenu(widget.auth, widget.logoutCallback),
+          body: FutureBuilder(
+            future: demo(),
+            builder: (_, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: Text("Loading..."),
+                );
+              } else {
+                return ListView.builder(
+                  itemCount: snapshot.data.length,
+                  itemBuilder: (_, index) {
+                    return MyCard(snapshot.data[index]);
+                  },
+                );
+              }
+            },
+          )),
     );
   }
 }
