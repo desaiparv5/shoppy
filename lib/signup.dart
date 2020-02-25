@@ -1,8 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shoppy1/homePage.dart';
+import 'BaseAuth.dart';
 
 class SignUp extends StatefulWidget {
-  SignUp();
+  final BaseAuth auth;
+  final VoidCallback loginCallback;
+  final VoidCallback logoutCallback;
 
+  SignUp(this.auth, this.loginCallback, this.logoutCallback);
   @override
   _SignUpState createState() => _SignUpState();
 }
@@ -11,6 +17,34 @@ class _SignUpState extends State<SignUp> {
   static final formKey = GlobalKey<FormState>();
 
   static final controller = TextEditingController();
+
+  static String name_val,
+      email_val,
+      password_val,
+      add1_val,
+      add2_val,
+      phone_val,
+      pin_val;
+
+  Future<void> signup() async {
+    if (formKey.currentState.validate()) {
+      formKey.currentState.save();
+      String uid = "";
+      try {
+        uid = await widget.auth.signUp(email_val, password_val);
+        if (uid.length > 0 && uid != null) {
+          widget.loginCallback();
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => HomePage(
+                        auth: widget.auth,
+                        logoutCallback: widget.logoutCallback,
+                      )));
+        }
+      } catch (e) {}
+    }
+  }
 
   final name = TextFormField(
     style: TextStyle(fontFamily: "Hero"),
@@ -26,11 +60,15 @@ class _SignUpState extends State<SignUp> {
       else
         return null;
     },
+    onSaved: (val) {
+      name_val = val;
+    },
   );
 
   final phone = TextFormField(
     style: TextStyle(fontFamily: "Hero"),
     autofocus: false,
+    keyboardType: TextInputType.phone,
     decoration: InputDecoration(
         hintText: "Phone Number",
         contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
@@ -38,9 +76,12 @@ class _SignUpState extends State<SignUp> {
         prefixIcon: Icon(Icons.phone)),
     validator: (val) {
       if (val.isEmpty)
-        return "Please enter name";
+        return "Please enter Phone";
       else
         return null;
+    },
+    onSaved: (val) {
+      phone_val = val;
     },
   );
 
@@ -64,6 +105,9 @@ class _SignUpState extends State<SignUp> {
       } else
         return null;
     },
+    onSaved: (val) {
+      email_val = val;
+    },
   );
 
   final password = TextFormField(
@@ -77,25 +121,24 @@ class _SignUpState extends State<SignUp> {
       prefixIcon: Icon(Icons.lock),
     ),
     validator: (val) => val.isEmpty ? "Password Required" : null,
+    onSaved: (val) {
+      password_val = val;
+    },
   );
 
-  final loginButton = Padding(
-    padding: EdgeInsets.symmetric(vertical: 16.0),
-    child: RaisedButton(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
-      onPressed: () {
-        if (formKey.currentState.validate()) {
-          print("success");
-        }
-      },
-      padding: EdgeInsets.all(12),
-      color: Colors.blue,
-      child: Text('Sign Up',
-          style: TextStyle(color: Colors.white, fontFamily: 'Hero')),
-    ),
-  );
+//  final loginButton = Padding(
+//    padding: EdgeInsets.symmetric(vertical: 16.0),
+//    child: RaisedButton(
+//      shape: RoundedRectangleBorder(
+//        borderRadius: BorderRadius.circular(24),
+//      ),
+//      onPressed: signup,
+//      padding: EdgeInsets.all(12),
+//      color: Colors.blue,
+//      child: Text('Sign Up',
+//          style: TextStyle(color: Colors.white, fontFamily: 'Hero')),
+//    ),
+//  );
 
   final addressl1 = TextFormField(
     maxLines: null,
@@ -110,6 +153,9 @@ class _SignUpState extends State<SignUp> {
       prefixIcon: Icon(Icons.add_location),
     ),
     validator: (val) => val.isEmpty ? "Address Required" : null,
+    onSaved: (val) {
+      add1_val = val;
+    },
   );
   final addressl2 = TextFormField(
     maxLines: null,
@@ -123,6 +169,9 @@ class _SignUpState extends State<SignUp> {
       prefixIcon: Icon(Icons.add_location),
     ),
     validator: (val) => val.isEmpty ? "Address Required" : null,
+    onSaved: (val) {
+      add2_val = val;
+    },
   );
 
   final pincode = TextFormField(
@@ -138,12 +187,13 @@ class _SignUpState extends State<SignUp> {
     validator: (val) {
       if (val.isEmpty)
         return "Pincode Required";
-      else if (!RegExp(
-              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-          .hasMatch(val)) {
+      else if (!RegExp(r"^[1-9][0-9]{5}$").hasMatch(val)) {
         return "Invalid Pincode ";
       } else
         return null;
+    },
+    onSaved: (val) {
+      pin_val = val;
     },
   );
 
@@ -181,7 +231,19 @@ class _SignUpState extends State<SignUp> {
             SizedBox(height: 8.0),
             pincode,
             //SizedBox(height: 24.0),
-            loginButton,
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.0),
+              child: RaisedButton(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                onPressed: signup,
+                padding: EdgeInsets.all(12),
+                color: Colors.blue,
+                child: Text('Sign Up',
+                    style: TextStyle(color: Colors.white, fontFamily: 'Hero')),
+              ),
+            ),
           ],
         ),
       ),

@@ -5,8 +5,9 @@ import 'BaseAuth.dart';
 class Login extends StatefulWidget {
   final BaseAuth auth;
   final VoidCallback loginCallback;
+  final VoidCallback logoutCallback;
 
-  Login(this.auth, this.loginCallback);
+  Login(this.auth, this.loginCallback, this.logoutCallback);
 
   @override
   LoginState createState() => LoginState();
@@ -109,7 +110,10 @@ class LoginState extends State<Login> {
             child: FlatButton(
               onPressed: () {
                 Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => SignUp()));
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => SignUp(widget.auth,
+                            widget.loginCallback, widget.logoutCallback)));
               },
               child: Text("Don't Have an Account? Sign Up"),
             ),
