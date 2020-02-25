@@ -32,6 +32,7 @@ class _SignUpState extends State<SignUp> {
       String uid = "";
       try {
         uid = await widget.auth.signUp(email_val, password_val);
+        print(uid);
         if (uid.length > 0 && uid != null) {
           widget.loginCallback();
           Navigator.pushReplacement(
