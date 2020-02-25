@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:shoppy1/login.dart';
+import './homePage.dart';
 import 'BaseAuth.dart';
 
 class Root extends StatefulWidget {
@@ -67,11 +68,11 @@ class _RootState extends State<Root> {
         break;
 
       case AuthStatus.NOT_LOGGED_IN:
-        return Text("Login page");
+        return Login(widget.auth, setLogin);
         break;
       case AuthStatus.LOGGED_IN:
         if (uid.length > 0 && uid != null) {
-          return Text("Login page");
+          return HomePage();
         } else {
           return showLoading();
         }
