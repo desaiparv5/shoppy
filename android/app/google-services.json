@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "580507901915",
+    "firebase_url": "https://shoppyhackathon.firebaseio.com",
+    "project_id": "shoppyhackathon",
+    "storage_bucket": "shoppyhackathon.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:580507901915:android:cbd91f83a182ddf23d11fe",
+        "android_client_info": {
+          "package_name": "com.example.shoppy1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "580507901915-eui52jiq62hdmpd04j8li4reavugt3gq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcxtiwTA5tZmySqqhWqkVcKOY-ODpQhCs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "580507901915-eui52jiq62hdmpd04j8li4reavugt3gq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
