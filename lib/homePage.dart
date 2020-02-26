@@ -14,24 +14,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final databaseRef = Firestore.instance;
-  List<DocumentSnapshot> data;
-  Future<void> getData() async {
-    //print(data);
-  }
-
-  List<Widget> shopList() {
-    List<Widget> array = [];
-    getData().then((value) {
-      print(data);
-      data.forEach((f) {
-        print(f.data["Rating"]);
-        array.add(MyCard(f));
-      });
-      print(array);
-      return array;
-    });
-  }
-
   Future demo() async {
     QuerySnapshot querySnapshot =
         await databaseRef.collection("Shops").getDocuments();
