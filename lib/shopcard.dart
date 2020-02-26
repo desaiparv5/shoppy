@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shoppy1/shopDetail.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class MyCard extends StatefulWidget {
   DocumentSnapshot data;
@@ -14,10 +15,12 @@ class _MyCardState extends State<MyCard> {
   String ratings = "";
   String status = "Open";
   String ShopID = "";
+  String shopImage = "";
 
   @override
   Widget build(BuildContext context) {
     shop_name = widget.data["Name"];
+    shopImage = widget.data["ShopImage"];
     ratings = widget.data["Rating"].toString();
     ShopID = widget.data.documentID;
     print(ShopID);
@@ -36,10 +39,10 @@ class _MyCardState extends State<MyCard> {
             elevation: 10,
             child: Row(
               children: <Widget>[
-                Image(
-                  image: AssetImage(
-                    "images/s1.png",
-                  ),
+                CachedNetworkImage(
+                  imageUrl: "$shopImage",
+                  placeholder: (context, url) => CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
                   height: 100,
                 ),
                 Container(
