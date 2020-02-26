@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import './BaseAuth.dart';
 import "./shopcard.dart";
 import './drawer.dart';
@@ -18,6 +19,18 @@ class _HomePageState extends State<HomePage> {
     QuerySnapshot querySnapshot =
         await databaseRef.collection("Shops").getDocuments();
     return querySnapshot.documents;
+  }
+
+  void getpref() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.clear();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    getpref();
+    super.initState();
   }
 
   @override

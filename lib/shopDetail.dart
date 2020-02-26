@@ -1,5 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'Cart.dart';
+import 'viewCartButton.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import './ShopItem.dart';
 
 class ShopDetails extends StatefulWidget {
   String shopId;
@@ -13,6 +17,8 @@ class _ShopDetailsState extends State<ShopDetails> {
   final databaseref = Firestore.instance;
   String shop_name = "";
   String address = "";
+  List<String> pname = [], pquantity = [], pprice = [];
+
   Future<DocumentSnapshot> demo() async {
     DocumentSnapshot docSnapshot =
         await databaseref.collection("Shops").document(widget.shopId).get();
@@ -21,11 +27,39 @@ class _ShopDetailsState extends State<ShopDetails> {
     return docSnapshot;
   }
 
-  void add(snapShot, i) {
-    setState(() {
-      array.add(shopItem(snapShot.data["Products"][i]["Name"],
-          snapShot.data["Products"][i]["Price"].toString()));
-    });
+  void set(name, quantity, price) {
+    if (pname.isEmpty) {
+      pname.add(name);
+      pquantity.add(quantity);
+      pprice.add(price);
+    } else if (pname.indexOf(name) == -1) {
+      pname.add(name);
+      pquantity.add(quantity);
+      pprice.add(price);
+    } else {
+      int i = pname.indexOf(name);
+      print("index:" + i.toString());
+      pquantity[i] = quantity;
+    }
+  }
+
+  void setData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setStringList("ProductName", pname);
+    pref.setStringList("ProductQuantity", pquantity);
+    pref.setStringList("ProductPrice", pprice);
+
+    /*print(pref.getStringList("ProductName").toString());
+    print(pref.getStringList("ProductQuantity").toString());
+    print(pref.getStringList("ProductPrice").toString());*/
+  }
+
+  void createList() {
+    setData();
+    Navigator.push(context, MaterialPageRoute(builder: (_) => Cart()));
+//    print("Name list: " + pname.toString());
+//    print("Quabt list: " + pquantity.toString());
+//    print("Price list: " + pprice.toString());
   }
 
   @override
@@ -33,8 +67,11 @@ class _ShopDetailsState extends State<ShopDetails> {
     super.initState();
     demo().then((snapShot) {
       for (var i = 0; i < snapShot.data["Products"].length; i++) {
-        array.add(shopItem(snapShot.data["Products"][i]["Name"],
-            snapShot.data["Products"][i]["Price"].toString()));
+        array.add(shopItem(
+            snapShot.data["Products"][i]["Name"],
+            snapShot.data["Products"][i]["Price"].toString(),
+            widget.shopId,
+            set));
       }
     });
   }
@@ -45,6 +82,16 @@ class _ShopDetailsState extends State<ShopDetails> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
+        actions: <Widget>[
+          RaisedButton(
+            child: Icon(
+              Icons.shopping_cart,
+              color: Colors.white,
+            ),
+            color: Colors.transparent,
+            onPressed: createList,
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(children: <Widget>[
@@ -91,17 +138,27 @@ class _ShopDetailsState extends State<ShopDetails> {
                 ),
                 Container(
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(8.0),
                     child: FutureBuilder(
                       future: demo(),
                       builder: (_, snapshot) {
+//                        if (snapshot.connectionState ==
+//                            ConnectionState.waiting) {
+//                          return Text("Loading...");
+//                        } else {
+//                          return Column(
+//                            children: array,
+//                          );
+//                        }
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           return Text("Loading...");
-                        } else {
+                        } else if (snapshot.hasData) {
                           return Column(
                             children: array,
                           );
+                        } else {
+                          return Text("Error fetching data");
                         }
                       },
                     ), //shopItem(),
@@ -112,148 +169,7 @@ class _ShopDetailsState extends State<ShopDetails> {
           ),
         ]),
       ),
-    );
-  }
-}
-
-class shopItem extends StatefulWidget {
-  String name, price;
-  shopItem(this.name, this.price);
-  @override
-  _shopItemState createState() => _shopItemState();
-}
-
-class _shopItemState extends State<shopItem> {
-//  String product_name = widget.name;
-//  int price = int.parse(widget.price);
-  int counter = 1;
-  int c = 0;
-  Widget add_button() {
-    if (c == 0) {
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Text(
-            "Add",
-            style: TextStyle(fontSize: 15),
-          ),
-        ),
-      );
-    } else {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          GestureDetector(
-            child: Container(
-              height: 30,
-              width: 30,
-              child: Icon(Icons.remove),
-              color: Colors.black12,
-            ),
-            onTap: () {
-              setState(() {
-                decrement();
-              });
-            },
-          ),
-          Container(
-            height: 30,
-            width: 30,
-            child: Center(
-                child: Text(
-              "$counter",
-              style: TextStyle(fontSize: 20),
-            )),
-            color: Colors.black12,
-          ),
-          GestureDetector(
-            child: Container(
-              height: 30,
-              width: 30,
-              child: Icon(Icons.add),
-              color: Colors.black12,
-            ),
-            onTap: () {
-              setState(() {
-                increment();
-              });
-            },
-          ),
-        ],
-      );
-    }
-  }
-
-  void decrement() {
-    if (counter != 1) {
-      counter = counter - 1;
-    } else {
-      c = 0;
-    }
-  }
-
-  void increment() {
-    counter = counter + 1;
-  }
-
-  void increment_c() {
-    c = c + 1;
-    print(c);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 10,
-      child: Container(
-        height: 100,
-        child: Row(
-          children: <Widget>[
-            Image(
-              image: AssetImage("images/s1.png"),
-            ),
-            SizedBox(
-              width: 20,
-            ),
-            Expanded(
-              child: Container(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        widget.name,
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        widget.price,
-                        style: TextStyle(fontSize: 15),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    increment_c();
-                  });
-                },
-                child: add_button(),
-              ),
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: bottomButton(createList),
     );
   }
 }
