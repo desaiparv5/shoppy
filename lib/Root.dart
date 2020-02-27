@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shoppy1/login.dart';
 import './homePage.dart';
 import 'BaseAuth.dart';
+import './homePage1.dart';
 
 class Root extends StatefulWidget {
   BaseAuth auth;
@@ -76,6 +78,11 @@ class _RootState extends State<Root> {
             auth: widget.auth,
             logoutCallback: setLogout,
           );
+          /*HomePage(
+            auth: widget.auth,
+            logoutCallback: setLogout,
+
+          );*/
         } else {
           return showLoading();
         }

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class shopItem extends StatefulWidget {
-  String name, price, shopId;
+  String name, price, shopId, ImageUrl;
   Function set;
-  shopItem(this.name, this.price, this.shopId, this.set);
+  shopItem(this.name, this.ImageUrl, this.price, this.shopId, this.set);
   @override
   _shopItemState createState() => _shopItemState();
 }
@@ -114,8 +115,10 @@ class _shopItemState extends State<shopItem> {
         height: 100,
         child: Row(
           children: <Widget>[
-            Image(
-              image: AssetImage("images/s1.png"),
+            CachedNetworkImage(
+              imageUrl: widget.ImageUrl.toString(),
+              placeholder: (context, url) => CircularProgressIndicator(),
+              errorWidget: (context, url, error) => Icon(Icons.error),
             ),
             SizedBox(
               width: 20,
