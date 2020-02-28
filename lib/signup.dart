@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import './Category.dart';
+import './Category.dart';
 import 'package:shoppy1/homePage.dart';
 import 'BaseAuth.dart';
 
@@ -27,9 +29,8 @@ class _SignUpState extends State<SignUp> {
       pin_val;
 
   Future<void> signup() async {
-    Map data =
-    {
-      'name':name_val,
+    Map data = {
+      'name': name_val,
       'email': email_val,
       'password': password_val,
       'add1': add1_val,
@@ -47,7 +48,7 @@ class _SignUpState extends State<SignUp> {
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                  builder: (context) => HomePage(
+                  builder: (context) => Categories(
                         auth: widget.auth,
                         logoutCallback: widget.logoutCallback,
                       )));

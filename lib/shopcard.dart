@@ -1,17 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shoppy1/BaseAuth.dart';
 import 'package:shoppy1/shopDetail.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyCard extends StatefulWidget {
-  String shopName, shopImage, shopRating, shopID, shopAddress;
-  String txtProd;
+  String shopName, shopImage, shopRating, shopID, shopAddress, productSearch;
+  BaseAuth auth;
   MyCard(
       {this.shopName,
       this.shopImage,
       this.shopRating,
       this.shopID,
-      this.shopAddress});
+      this.shopAddress,
+      this.auth,
+      this.productSearch});
   @override
   _MyCardState createState() => _MyCardState();
 }
@@ -40,6 +44,81 @@ class _MyCardState extends State<MyCard> {
 //    return Container();
 //  }
 
+  void CartKhalikaro() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.clear();
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ShopDetails(
+                shopImage: widget.shopImage,
+                shopAddress: widget.shopAddress,
+                shopName: widget.shopName,
+                shopID: widget.shopID,
+                priorityProduct: widget.productSearch)));
+    //Navigator.of(context, rootNavigator: true).pop('dialog');
+  }
+
+  void showAlert(BuildContext context) {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+              title: Text("Proceed will clear the cart"),
+              content: Row(
+                children: <Widget>[
+                  FlatButton(
+                    child: Text("Go Back"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  FlatButton(
+                    child: Text("Proceed"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      CartKhalikaro();
+                    },
+                  )
+                ],
+              ),
+            ));
+  }
+
+  void showPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String ShopId = prefs.getString("ShopID") ?? "0";
+    print("Pref ma" + ShopId);
+    print("Card ma" + widget.shopID);
+    if (ShopId.compareTo("0") != 0) {
+      if (ShopId.compareTo(widget.shopID) != 0) {
+        showAlert(context);
+      } else {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ShopDetails(
+                    shopID: widget.shopID,
+                    shopName: widget.shopName,
+                    shopAddress: widget.shopAddress,
+                    shopImage: widget.shopImage,
+                    priorityProduct: widget.productSearch)));
+      }
+    } else {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ShopDetails(
+                  shopID: widget.shopID,
+                  shopName: widget.shopName,
+                  shopAddress: widget.shopAddress,
+                  shopImage: widget.shopImage,
+                  priorityProduct: widget.productSearch)));
+    }
+    print(ShopId);
+    print("Widget" + widget.shopID);
+  }
+
   Widget show() {
     return Padding(
       padding: const EdgeInsets.all(10.0),
@@ -49,14 +128,7 @@ class _MyCardState extends State<MyCard> {
         ),
         child: GestureDetector(
           onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ShopDetails(
-                        widget.shopID,
-                        widget.shopName,
-                        widget.shopImage,
-                        widget.shopAddress)));
+            showPrefs();
           },
           child: Card(
             elevation: 10,

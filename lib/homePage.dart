@@ -12,7 +12,8 @@ import 'dart:math';
 class HomePage extends StatefulWidget {
   final BaseAuth auth;
   final VoidCallback logoutCallback;
-  HomePage({this.auth, this.logoutCallback});
+  final String category;
+  HomePage({this.auth, this.logoutCallback, this.category});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -24,8 +25,9 @@ class _HomePageState extends State<HomePage> {
   TextEditingController txt;
   bool flag = false;
   bool found = false;
+  int delivery = 15;
   TextEditingController txtprod = TextEditingController();
-  String pincode = "389230";
+  String pincode = "388120";
   final databaseRef = Firestore.instance;
 
   void setArr(price) {
@@ -33,8 +35,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   void sortKar() {
-    print(priceArr);
-    print(array);
+    if (priceArr.isEmpty) {
+      return;
+    }
     List<Widget> temp = [];
     int length = priceArr.length;
     for (int j = 0; j < length; j++) {
@@ -42,14 +45,6 @@ class _HomePageState extends State<HomePage> {
       priceArr.removeAt(i);
       temp.add(array[i]);
       array.removeAt(i);
-      print("Price Array: " +
-          priceArr.toString() +
-          "\n" +
-          "Array: " +
-          array.toString() +
-          "\n" +
-          "Temp: " +
-          temp.toString());
     }
     setState(() {
       array = temp;
@@ -133,14 +128,13 @@ class _HomePageState extends State<HomePage> {
     databaseRef
         .collection("Shops")
         .where("Pincode", isEqualTo: pin)
-        .orderBy("Rating", descending: true)
+        .where("Category", isEqualTo: widget.category)
+        //.orderBy("Rating", descending: true)
         .snapshots()
         .listen((data) {
       data.documents.forEach((doc) {
-        print(doc.toString());
         if (flag) {
           List products = doc["Products"];
-          // print(widget.data["Name"] + " " + products[0]["Name"]);
           if (products != null && products.toString().isNotEmpty) {
             for (var i = 0; i < products.length; i++) {
               if (products[i]["Name"]
@@ -156,6 +150,7 @@ class _HomePageState extends State<HomePage> {
                     shopName: doc["Name"],
                     shopRating: doc["Rating"].toString(),
                     shopAddress: doc["Address"],
+                    productSearch: txtprod.text,
                   ));
                 });
               }
@@ -175,7 +170,6 @@ class _HomePageState extends State<HomePage> {
         }
       });
       if (!found) {
-        print("not foun");
         setState(() {
           array.add(Text("No shops sell this product"));
         });
@@ -193,7 +187,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
 
     setState(() {
-      //print(val);
       txt = TextEditingController(text: pincode);
     });
     demo(txt.text);
@@ -209,7 +202,11 @@ class _HomePageState extends State<HomePage> {
                 children: <Widget>[
                   Expanded(
                     child: Container(
-                      child: Text("Shoppy"),
+                      child: Text("Shoppy",
+                          style: TextStyle(
+                              fontSize: 35,
+                              color: Colors.white,
+                              fontFamily: "Billabong")),
                     ),
                   ),
                   Column(

@@ -14,7 +14,6 @@ class _shopItemState extends State<shopItem> {
   int counter = 1;
   int c = 0;
   Map getData() {
-    print("Counter ni value: " + counter.toString());
     Map data = {
       "Name": widget.name,
       "Quantity": counter,
@@ -88,12 +87,6 @@ class _shopItemState extends State<shopItem> {
     widget.set(widget.name, counter.toString(), widget.price);
   }
 
-//  void storeIncrement(counter) async {
-//    final prefs = await SharedPreferences.getInstance();
-//    prefs.setString("ShopId", widget.shopId);
-//    print(prefs.getString("ShopId"));
-//  }
-
   void increment() {
     counter = counter + 1;
     widget.set(widget.name, counter.toString(), widget.price);
@@ -116,6 +109,8 @@ class _shopItemState extends State<shopItem> {
         child: Row(
           children: <Widget>[
             CachedNetworkImage(
+              height: 100,
+              width: 100,
               imageUrl: widget.ImageUrl.toString(),
               placeholder: (context, url) => CircularProgressIndicator(),
               errorWidget: (context, url, error) => Icon(Icons.error),

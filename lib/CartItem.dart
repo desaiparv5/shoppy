@@ -87,12 +87,19 @@ class _CartItemState extends State<CartItem> {
     return (counter <= 0)
         ? Container()
         : Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+            child: Column(
               children: <Widget>[
-                Text("$item_name"),
-                add_button(),
-                Text((countPrice())),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    Text("$item_name"),
+                    add_button(),
+                    Text((countPrice())),
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                )
               ],
             ),
           );

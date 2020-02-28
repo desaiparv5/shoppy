@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shoppy1/BaseAuth.dart';
 import 'package:shoppy1/Cart.dart';
+import 'package:shoppy1/homePage.dart';
 import 'viewCartButton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -8,8 +10,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import './ShopItem.dart';
 
 class ShopDetails extends StatefulWidget {
-  String shopName, shopImage, shopID, shopAddress;
-  ShopDetails(this.shopID, this.shopName, this.shopImage, this.shopAddress);
+  String shopName, shopImage, shopID, shopAddress, priorityProduct;
+  ShopDetails(
+      {this.shopID,
+      this.shopName,
+      this.shopImage,
+      this.shopAddress,
+      this.priorityProduct});
   @override
   _ShopDetailsState createState() => _ShopDetailsState();
 }
@@ -54,35 +61,14 @@ class _ShopDetailsState extends State<ShopDetails> {
     pref.setStringList("ProductName", pname);
     pref.setStringList("ProductQuantity", pquantity);
     pref.setStringList("ProductPrice", pprice);
-    pref.setString("ShopID", widget.shopID.toString());
-    //print(pref.getStringList("ProductName").toString());
-    //print(pref.getStringList("ProductQuantity").toString());
-    // print(pref.getStringList("ProductPrice").toString());
+    if (pquantity.length > 0) {
+      pref.setString("ShopID", widget.shopID.toString());
+    }
   }
 
   void createList() {
     setData();
     Navigator.push(context, MaterialPageRoute(builder: (_) => Cart()));
-//    print("Name list: " + pname.toString());
-//    print("Quabt list: " + pquantity.toString());
-//    print("Price list: " + pprice.toString());
-  }
-
-  void showAlert(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-              title: Text("Biji shop che"),
-              content: Text("Wifi not detected. Please activate it."),
-            ));
-  }
-
-  void showPrefs() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    String ShopId = pref.getString("ShopID");
-    if (ShopId != widget.shopID) {
-      //showAlert(context);
-    }
   }
 
   @override
@@ -90,15 +76,38 @@ class _ShopDetailsState extends State<ShopDetails> {
     super.initState();
     shop_name = widget.shopName;
     address = widget.shopAddress;
-    showPrefs();
+    //showPrefs();
     demo().then((snapShot) {
       for (var i = 0; i < snapShot.data["Products"].length; i++) {
-        array.add(shopItem(
-            snapShot.data["Products"][i]["Name"],
-            snapShot.data["Products"][i]["ProductImage"],
-            snapShot.data["Products"][i]["Price"].toString(),
-            widget.shopID,
-            set));
+        if (widget.priorityProduct == null) {
+          array.add(shopItem(
+              snapShot.data["Products"][i]["Name"],
+              snapShot.data["Products"][i]["ProductImage"],
+              snapShot.data["Products"][i]["Price"].toString(),
+              widget.shopID,
+              set));
+        } else {
+          if (snapShot.data["Products"][i]["Name"]
+              .toString()
+              .toLowerCase()
+              .contains(widget.priorityProduct.toLowerCase())) {
+            array.insert(
+                0,
+                shopItem(
+                    snapShot.data["Products"][i]["Name"],
+                    snapShot.data["Products"][i]["ProductImage"],
+                    snapShot.data["Products"][i]["Price"].toString(),
+                    widget.shopID,
+                    set));
+          } else {
+            array.add(shopItem(
+                snapShot.data["Products"][i]["Name"],
+                snapShot.data["Products"][i]["ProductImage"],
+                snapShot.data["Products"][i]["Price"].toString(),
+                widget.shopID,
+                set));
+          }
+        }
       }
     });
   }
