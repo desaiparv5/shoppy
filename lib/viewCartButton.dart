@@ -12,7 +12,7 @@ class _bottomButtonState extends State<bottomButton> {
   Widget build(BuildContext context) {
     return BottomAppBar(
       child: Container(
-        color: Colors.transparent,
+        //color: Colors.transparent,
         height: 70,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -27,10 +27,7 @@ class _bottomButtonState extends State<bottomButton> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text("Items"),
-                      Text("Price"),
-                    ],
+                    children: <Widget>[],
                   ),
                 ),
                 Row(

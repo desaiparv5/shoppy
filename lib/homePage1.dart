@@ -1,55 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import './BaseAuth.dart';
 import "./shopcard.dart";
-import './Cart.dart';
+import 'package:keyboard_avoider/keyboard_avoider.dart';
 import './drawer.dart';
-import 'dart:math';
 
-class HomePage extends StatefulWidget {
+class HomePage1 extends StatefulWidget {
   final BaseAuth auth;
   final VoidCallback logoutCallback;
-  final String category;
-  HomePage({this.auth, this.logoutCallback, this.category});
+
+  HomePage1({this.auth, this.logoutCallback});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomePage1State createState() => _HomePage1State();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePage1State extends State<HomePage1> {
   List<Widget> array = [];
-  List<int> priceArr = [];
   TextEditingController txt;
-  bool flag = false;
-  bool found = false;
-  int delivery = 15;
   TextEditingController txtprod = TextEditingController();
-  String pincode = "388120";
+  String pincode = "389230";
   final databaseRef = Firestore.instance;
-
-  void setArr(price) {
-    priceArr.add(price);
-  }
-
-  void sortKar() {
-    if (priceArr.isEmpty) {
-      return;
-    }
-    List<Widget> temp = [];
-    int length = priceArr.length;
-    for (int j = 0; j < length; j++) {
-      int i = priceArr.indexOf(priceArr.reduce(min));
-      priceArr.removeAt(i);
-      temp.add(array[i]);
-      array.removeAt(i);
-    }
-    setState(() {
-      array = temp;
-    });
-  }
 
   Future demo(String pin) async {
     array = [];
@@ -81,7 +54,6 @@ class _HomePageState extends State<HomePage> {
                   }
                 : () {
                     setState(() {
-                      priceArr = [-3, -2, -1];
                       demo(txt.text);
                     });
                   },
@@ -105,87 +77,35 @@ class _HomePageState extends State<HomePage> {
           child: FlatButton(
             child: Icon(Icons.search),
             onPressed: () {
-              found = false;
-              priceArr = [-3, -2, -1];
-              if (txtprod.text.isNotEmpty)
-                flag = true;
-              else
-                flag = false;
               demo(txt.text);
             },
           ),
         )
       ],
     ));
-    if (flag) {
-      array.add(RaisedButton(
-        child: Text("Sort by Price"),
-        onPressed: () {
-          sortKar();
-        },
-      ));
-    }
     databaseRef
         .collection("Shops")
         .where("Pincode", isEqualTo: pin)
-        .where("Category", isEqualTo: widget.category)
-        //.orderBy("Rating", descending: true)
         .snapshots()
         .listen((data) {
       data.documents.forEach((doc) {
-        if (flag) {
-          List products = doc["Products"];
-          if (products != null && products.toString().isNotEmpty) {
-            for (var i = 0; i < products.length; i++) {
-              if (products[i]["Name"]
-                  .toString()
-                  .toLowerCase()
-                  .contains(txtprod.text.toLowerCase())) {
-                found = true;
-                priceArr.add(products[i]["Price"]);
-                setState(() {
-                  array.add(MyCard(
-                    shopID: doc.documentID,
-                    shopImage: doc["ShopImage"],
-                    shopName: doc["Name"],
-                    shopRating: doc["Rating"].toString(),
-                    shopAddress: doc["Address"],
-                    productSearch: txtprod.text,
-                  ));
-                });
-              }
-            }
-          }
-        } else {
-          found = true;
-          setState(() {
-            array.add(MyCard(
-              shopID: doc.documentID,
-              shopImage: doc["ShopImage"],
-              shopName: doc["Name"],
-              shopRating: doc["Rating"].toString(),
-              shopAddress: doc["Address"],
-            ));
-          });
-        }
-      });
-      if (!found) {
         setState(() {
-          array.add(Text("No shops sell this product"));
+          //array.add(MyCard(doc, txtprod.text,);
         });
-      }
+      });
     });
+
+    ///return querySnapshot.documents;
   }
 
   void getpref() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    //pref.clear();
+    pref.clear();
   }
 
   @override
   void initState() {
     super.initState();
-
     setState(() {
       txt = TextEditingController(text: pincode);
     });
@@ -202,23 +122,14 @@ class _HomePageState extends State<HomePage> {
                 children: <Widget>[
                   Expanded(
                     child: Container(
-                      child: Text("Shoppy",
-                          style: TextStyle(
-                              fontSize: 35,
-                              color: Colors.white,
-                              fontFamily: "Billabong")),
+                      child: Text("Shoppy"),
                     ),
                   ),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
-                      GestureDetector(
-                          onTap: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (_) => Cart()));
-                          },
-                          child: Icon(Icons.shopping_cart)),
+                      Icon(Icons.shopping_cart),
                     ],
                   ),
                 ],

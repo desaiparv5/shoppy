@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import './Category.dart';
 import 'package:shoppy1/login.dart';
 import './homePage.dart';
 import 'BaseAuth.dart';
+import './homePage1.dart';
 
 class Root extends StatefulWidget {
   BaseAuth auth;
@@ -72,10 +75,15 @@ class _RootState extends State<Root> {
         break;
       case AuthStatus.LOGGED_IN:
         if (uid.length > 0 && uid != null) {
-          return HomePage(
+          return Categories(
             auth: widget.auth,
             logoutCallback: setLogout,
           );
+          /*HomePage(
+            auth: widget.auth,
+            logoutCallback: setLogout,
+
+          );*/
         } else {
           return showLoading();
         }

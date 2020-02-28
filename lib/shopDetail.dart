@@ -1,13 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'Cart.dart';
+import 'package:shoppy1/BaseAuth.dart';
+import 'package:shoppy1/Cart.dart';
+import 'package:shoppy1/homePage.dart';
 import 'viewCartButton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 import './ShopItem.dart';
 
 class ShopDetails extends StatefulWidget {
-  String shopId;
-  ShopDetails(this.shopId);
+  String shopName, shopImage, shopID, shopAddress, priorityProduct;
+  ShopDetails(
+      {this.shopID,
+      this.shopName,
+      this.shopImage,
+      this.shopAddress,
+      this.priorityProduct});
   @override
   _ShopDetailsState createState() => _ShopDetailsState();
 }
@@ -21,13 +30,18 @@ class _ShopDetailsState extends State<ShopDetails> {
 
   Future<DocumentSnapshot> demo() async {
     DocumentSnapshot docSnapshot =
-        await databaseref.collection("Shops").document(widget.shopId).get();
-    print("JO to: " + docSnapshot.toString());
-    print("length" + docSnapshot.data["Products"].length.toString());
+        await databaseref.collection("Shops").document(widget.shopID).get();
     return docSnapshot;
   }
 
   void set(name, quantity, price) {
+    if (quantity == 0) {
+      int i = pname.indexOf(name);
+      pname.removeAt(i);
+      pquantity.removeAt(i);
+      pprice.removeAt(i);
+      return;
+    }
     if (pname.isEmpty) {
       pname.add(name);
       pquantity.add(quantity);
@@ -38,7 +52,6 @@ class _ShopDetailsState extends State<ShopDetails> {
       pprice.add(price);
     } else {
       int i = pname.indexOf(name);
-      print("index:" + i.toString());
       pquantity[i] = quantity;
     }
   }
@@ -48,30 +61,53 @@ class _ShopDetailsState extends State<ShopDetails> {
     pref.setStringList("ProductName", pname);
     pref.setStringList("ProductQuantity", pquantity);
     pref.setStringList("ProductPrice", pprice);
-
-    /*print(pref.getStringList("ProductName").toString());
-    print(pref.getStringList("ProductQuantity").toString());
-    print(pref.getStringList("ProductPrice").toString());*/
+    if (pquantity.length > 0) {
+      pref.setString("ShopID", widget.shopID.toString());
+    }
   }
 
   void createList() {
     setData();
     Navigator.push(context, MaterialPageRoute(builder: (_) => Cart()));
-//    print("Name list: " + pname.toString());
-//    print("Quabt list: " + pquantity.toString());
-//    print("Price list: " + pprice.toString());
   }
 
   @override
   void initState() {
     super.initState();
+    shop_name = widget.shopName;
+    address = widget.shopAddress;
+    //showPrefs();
     demo().then((snapShot) {
       for (var i = 0; i < snapShot.data["Products"].length; i++) {
-        array.add(shopItem(
-            snapShot.data["Products"][i]["Name"],
-            snapShot.data["Products"][i]["Price"].toString(),
-            widget.shopId,
-            set));
+        if (widget.priorityProduct == null) {
+          array.add(shopItem(
+              snapShot.data["Products"][i]["Name"],
+              snapShot.data["Products"][i]["ProductImage"],
+              snapShot.data["Products"][i]["Price"].toString(),
+              widget.shopID,
+              set));
+        } else {
+          if (snapShot.data["Products"][i]["Name"]
+              .toString()
+              .toLowerCase()
+              .contains(widget.priorityProduct.toLowerCase())) {
+            array.insert(
+                0,
+                shopItem(
+                    snapShot.data["Products"][i]["Name"],
+                    snapShot.data["Products"][i]["ProductImage"],
+                    snapShot.data["Products"][i]["Price"].toString(),
+                    widget.shopID,
+                    set));
+          } else {
+            array.add(shopItem(
+                snapShot.data["Products"][i]["Name"],
+                snapShot.data["Products"][i]["ProductImage"],
+                snapShot.data["Products"][i]["Price"].toString(),
+                widget.shopID,
+                set));
+          }
+        }
       }
     });
   }
@@ -105,7 +141,7 @@ class _ShopDetailsState extends State<ShopDetails> {
                       image: DecorationImage(
                           colorFilter: new ColorFilter.mode(
                               Colors.black.withOpacity(0.7), BlendMode.darken),
-                          image: AssetImage("images/s1.png"),
+                          image: CachedNetworkImageProvider(widget.shopImage),
                           fit: BoxFit.cover)),
                   width: double.infinity,
                   child: Padding(

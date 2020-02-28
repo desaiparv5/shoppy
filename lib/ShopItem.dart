@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class shopItem extends StatefulWidget {
-  String name, price, shopId;
+  String name, price, shopId, ImageUrl;
   Function set;
-  shopItem(this.name, this.price, this.shopId, this.set);
+  shopItem(this.name, this.ImageUrl, this.price, this.shopId, this.set);
   @override
   _shopItemState createState() => _shopItemState();
 }
@@ -13,7 +14,6 @@ class _shopItemState extends State<shopItem> {
   int counter = 1;
   int c = 0;
   Map getData() {
-    print("Counter ni value: " + counter.toString());
     Map data = {
       "Name": widget.name,
       "Quantity": counter,
@@ -87,12 +87,6 @@ class _shopItemState extends State<shopItem> {
     widget.set(widget.name, counter.toString(), widget.price);
   }
 
-//  void storeIncrement(counter) async {
-//    final prefs = await SharedPreferences.getInstance();
-//    prefs.setString("ShopId", widget.shopId);
-//    print(prefs.getString("ShopId"));
-//  }
-
   void increment() {
     counter = counter + 1;
     widget.set(widget.name, counter.toString(), widget.price);
@@ -114,8 +108,12 @@ class _shopItemState extends State<shopItem> {
         height: 100,
         child: Row(
           children: <Widget>[
-            Image(
-              image: AssetImage("images/s1.png"),
+            CachedNetworkImage(
+              height: 100,
+              width: 100,
+              imageUrl: widget.ImageUrl.toString(),
+              placeholder: (context, url) => CircularProgressIndicator(),
+              errorWidget: (context, url, error) => Icon(Icons.error),
             ),
             SizedBox(
               width: 20,
